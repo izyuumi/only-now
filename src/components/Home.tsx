@@ -7,7 +7,7 @@ const Home = () => {
 
   return (
     <div className="w-screen h-screen flex justify-center items-center">
-      <div className="w-64 gap-2 flex flex-col  ">
+      <div className="w-64 gap-2 flex flex-col">
         <Input
           className="w-full"
           value={roomCode}
