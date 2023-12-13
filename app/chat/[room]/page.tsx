@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { getUserFromRoom } from "@/utils";
+import { cacheRoomAndUser, getUserFromRoom } from "@/utils";
 import { createClient } from "@/utils/supabase/client";
 import { Share } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -35,6 +35,7 @@ export default function Chat({ params }: { params: { room: string } }) {
     if (error) console.error(error);
     const { uuid } = JSON.parse(data);
     setMyUuid(uuid);
+    cacheRoomAndUser(params.room, uuid);
     subscribeToRoom();
   };
 
@@ -59,7 +60,6 @@ export default function Chat({ params }: { params: { room: string } }) {
   }, []);
 
   const sendMessage = async () => {
-    console.log(myUuid);
     if (!myUuid) return;
     const { error } = await supabase.functions.invoke("updateMessage", {
       body: {
