@@ -96,14 +96,14 @@ export default function Chat({ params }: { params: { room: string } }) {
     if (isPrivate) {
       toast({
         title: "Private room",
-        description: "This room is private",
+        description: "This room is now private",
       });
     }
     else {
 
       toast({
         title: "Public room",
-        description: "This room is public",
+        description: "This room is now public",
       });
     }
 
@@ -126,11 +126,11 @@ export default function Chat({ params }: { params: { room: string } }) {
         <Share aria-hidden />
       </Button>
       <Button
-        className="absolute top-4 right-10"
+        className="absolute top-4 right-18"
         variant="ghost"
         onClick={privateRoom}
       >
-        {isPrivate ? <Lock aria-hidden /> : <Unlock aria-hidden />}
+        {isPrivate ? <Unlock aria-hidden /> : <Lock aria-hidden />}
       </Button>
       <div className="flex flex-col gap-2">
         <CustomTextarea
