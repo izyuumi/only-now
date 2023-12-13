@@ -92,11 +92,21 @@ export default function Chat({ params }: { params: { room: string } }) {
   };
 
   const privateRoom = () => {
-    
-    toast({
-      title: "Private room",
-      description: "This room is private",
-    });
+    setIsPrivate(!isPrivate);
+    if (isPrivate) {
+      toast({
+        title: "Private room",
+        description: "This room is private",
+      });
+    }
+    else {
+
+      toast({
+        title: "Public room",
+        description: "This room is public",
+      });
+    }
+
   };
 
   return (
@@ -109,11 +119,25 @@ export default function Chat({ params }: { params: { room: string } }) {
         <ChevronLeft aria-hidden />
       </Button>
       <Button
+        className="absolute top-4 right-4"
+        variant="ghost"
+        onClick={copyRoomLink}
+      >
+        <Share aria-hidden />
+      </Button>
+      <Button
+        className="absolute top-8 right-8"
+        variant="ghost"
+        onClick={privateRoom}
+      >
+        <Unlock aria-hidden />
+      </Button>
+      <Button
         className="absolute top-10 right-10"
         variant="ghost"
         onClick={privateRoom}
       >
-        <Lock aria-hidden />
+        {isPrivate ? <Lock aria-hidden /> : <Unlock aria-hidden />}
       </Button>
       <div className="flex flex-col gap-2">
         <CustomTextarea
