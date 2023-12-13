@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { cacheRoomAndUser, getUserFromRoom } from "@/utils";
 import { createClient } from "@/utils/supabase/client";
-import { Share } from "lucide-react";
+import { ChevronLeft, Share } from "lucide-react";
 import { use, useEffect, useState } from "react";
 
 export default function Chat({ params }: { params: { room: string } }) {
@@ -92,11 +92,19 @@ export default function Chat({ params }: { params: { room: string } }) {
   return (
     <div className="flex-1 w-full flex flex-col gap-20 items-center justify-center">
       <Button
+        className="absolute top-4 left-4"
+        variant="ghost"
+        onClick={() => (window.location.href = "/")}
+      >
+        <ChevronLeft aria-hidden />
+      </Button>
+      <Button
         className="absolute top-4 right-4"
         variant="ghost"
         onClick={copyRoomLink}
       >
         <Share aria-hidden />
+        BLECC
       </Button>
       <div className="flex flex-col gap-2">
         <CustomTextarea
