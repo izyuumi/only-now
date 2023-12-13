@@ -104,7 +104,6 @@ export default function Chat({ params }: { params: { room: string } }) {
         onClick={copyRoomLink}
       >
         <Share aria-hidden />
-        BLECC
       </Button>
       <div className="flex flex-col gap-2">
         <CustomTextarea
