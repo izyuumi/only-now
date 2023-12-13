@@ -56,6 +56,7 @@ export default function Chat({ params }: { params: { room: string } }) {
 
   useEffect(() => {
     const interval = setInterval(() => {
+      console.log("subscribing to room");
       subscribeToRoom();
     }, 500);
     return () => clearInterval(interval);
