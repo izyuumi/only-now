@@ -20,18 +20,23 @@ export const checkRoomHasEmptySlot = (
   roomData: Database["public"]["Tables"]["room"]["Row"]
 ) => {
   if (!roomData.user_one) {
+    console.log("user_one");
     return "user_one";
   }
   if (!roomData.user_two) {
+    console.log("user_two");
     return "user_two";
   }
   if(!roomData.user_three) {
+    console.log("user_three");
     return "user_three";
   }
   if(!roomData.user_four) {
+    console.log("user_four");
     return "user_four";
   }
   if(!roomData.user_five) {
+    console.log("user_five");
     return "user_five";
   }
   throw new Error("room is full");
