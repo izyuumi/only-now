@@ -14,7 +14,7 @@ export default function Chat({ params }: { params: { room: string } }) {
   const [myUuid, setMyUuid] = useState("");
   const [otherMessage, setOtherMessage] = useState("");
   const [message, setMessage] = useState("");
-  const [isPrivate, setIsPrivate] = useState(false);
+  const [isPrivate, setIsPrivate] = useState(true);
 
   const checkCache = () => {
     const uuid = getUserFromRoom(params.room);
@@ -126,7 +126,7 @@ export default function Chat({ params }: { params: { room: string } }) {
         <Share aria-hidden />
       </Button>
       <Button
-        className="absolute top-4 right-18"
+        className="absolute top-4 right-12"
         variant="ghost"
         onClick={privateRoom}
       >
