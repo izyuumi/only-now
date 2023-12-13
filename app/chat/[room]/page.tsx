@@ -40,7 +40,6 @@ export default function Chat({ params }: { params: { room: string } }) {
   };
 
   const subscribeToRoom = async () => {
-    console.log("subscribing to room", myUuid);
     if (!myUuid) return;
     const { data, error } = await supabase.functions.invoke("fetchMessage", {
       body: {
@@ -48,7 +47,7 @@ export default function Chat({ params }: { params: { room: string } }) {
         uuid: myUuid,
       },
     });
-    console.error(error);
+    if (error) console.error(error);
     const { message } = JSON.parse(data);
     setOtherMessage(message);
   };
