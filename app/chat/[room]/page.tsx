@@ -49,7 +49,9 @@ export default function Chat({ params }: { params: { room: string } }) {
     });
     if (error) console.error(error);
     const { message } = JSON.parse(data);
-    setOtherMessage(message);
+    if (message && message !== otherMessage) {
+      setOtherMessage(message);
+    }
   };
 
   useEffect(() => {
