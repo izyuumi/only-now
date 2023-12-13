@@ -40,12 +40,16 @@ export default function Chat({ params }: { params: { room: string } }) {
   };
 
   const subscribeToRoom = async () => {
-    const { data } = await supabase.functions.invoke("fetchMessage", {
+    console.log("subscribing to room", myUuid);
+    if (!myUuid) return;
+    const { data, error } = await supabase.functions.invoke("fetchMessage", {
       body: {
         room: params.room,
         uuid: myUuid,
       },
     });
+    console.error(error);
+    console.log(data);
     const { message } = JSON.parse(data);
     setOtherMessage(message);
   };
@@ -56,7 +60,7 @@ export default function Chat({ params }: { params: { room: string } }) {
       subscribeToRoom();
     }, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [myUuid]);
 
   useEffect(() => {
     checkCache();

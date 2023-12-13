@@ -12,6 +12,7 @@ serve(async (req) => {
   }
   try {
     const { room, uuid } = await req.json();
+    console.log({ room, uuid });
     // check room is non-empty strings
     if (!room || !uuid) {
       return new Response("room and uuid are required", {
