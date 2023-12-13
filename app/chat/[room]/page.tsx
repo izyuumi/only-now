@@ -49,16 +49,14 @@ export default function Chat({ params }: { params: { room: string } }) {
       },
     });
     console.error(error);
-    console.log(data);
     const { message } = JSON.parse(data);
     setOtherMessage(message);
   };
 
   useEffect(() => {
-    // repeat every 5 seconds
     const interval = setInterval(() => {
       subscribeToRoom();
-    }, 5000);
+    }, 500);
     return () => clearInterval(interval);
   }, [myUuid]);
 
