@@ -25,5 +25,14 @@ export const checkRoomHasEmptySlot = (
   if (!roomData.user_two) {
     return "user_two";
   }
+  if(!roomData.user_three) {
+    return "user_three";
+  }
+  if(!roomData.user_four) {
+    return "user_four";
+  }
+  if(!roomData.user_five) {
+    return "user_five";
+  }
   throw new Error("room is full");
 };
