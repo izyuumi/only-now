@@ -5,7 +5,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { cacheRoomAndUser, getUserFromRoom } from "@/utils";
 import { createClient } from "@/utils/supabase/client";
 import { Share } from "lucide-react";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 
 export default function Chat({ params }: { params: { room: string } }) {
   const supabase = createClient();
@@ -39,21 +39,24 @@ export default function Chat({ params }: { params: { room: string } }) {
     subscribeToRoom();
   };
 
-  const subscribeToRoom = () => {
-    const room = supabase
-      .channel("room")
-      .on(
-        "postgres_changes",
-        {
-          event: "UPDATE",
-          schema: "public",
-        },
-        (payload) => {
-          console.log(payload);
-        }
-      )
-      .subscribe();
+  const subscribeToRoom = async () => {
+    const { data } = await supabase.functions.invoke("fetchMessage", {
+      body: {
+        room: params.room,
+        uuid: myUuid,
+      },
+    });
+    const { message } = JSON.parse(data);
+    setOtherMessage(message);
   };
+
+  useEffect(() => {
+    // repeat every 5 seconds
+    const interval = setInterval(() => {
+      subscribeToRoom();
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     checkCache();

@@ -25,3 +25,16 @@ export const adminSupabase = createClient<Database>(
     },
   }
 );
+
+export const checkAuthorIsInRoom = (
+  roomData: Database["public"]["Tables"]["room"]["Row"],
+  author: string
+): "user_one" | "user_two" => {
+  if (roomData.user_one === author) {
+    return "user_one";
+  }
+  if (roomData.user_two === author) {
+    return "user_two";
+  }
+  throw new Error("author not in room");
+};

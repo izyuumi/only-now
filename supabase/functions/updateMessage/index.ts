@@ -1,5 +1,9 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { corsHeaders, adminSupabase } from "../_shared/cors.ts";
+import {
+  corsHeaders,
+  adminSupabase,
+  checkAuthorIsInRoom,
+} from "../_shared/cors.ts";
 import { Database } from "../_shared/supabase.ts";
 import { checkRoomExists } from "../_shared/utils.ts";
 
@@ -30,16 +34,3 @@ serve(async (req) => {
     return new Response(error.message, { status: 500 });
   }
 });
-
-const checkAuthorIsInRoom = (
-  roomData: Database["public"]["Tables"]["room"]["Row"],
-  author: string
-): "user_one" | "user_two" => {
-  if (roomData.user_one === author) {
-    return "user_one";
-  }
-  if (roomData.user_two === author) {
-    return "user_two";
-  }
-  throw new Error("author not in room");
-};
