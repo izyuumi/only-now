@@ -126,14 +126,7 @@ export default function Chat({ params }: { params: { room: string } }) {
         <Share aria-hidden />
       </Button>
       <Button
-        className="absolute top-8 right-8"
-        variant="ghost"
-        onClick={privateRoom}
-      >
-        <Unlock aria-hidden />
-      </Button>
-      <Button
-        className="absolute top-10 right-10"
+        className="absolute top-4 right-10"
         variant="ghost"
         onClick={privateRoom}
       >
