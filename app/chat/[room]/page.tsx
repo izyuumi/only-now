@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { cacheRoomAndUser, getUserFromRoom } from "@/utils";
 import { createClient } from "@/utils/supabase/client";
-import { ChevronLeft, Share } from "lucide-react";
+import { ChevronLeft, Share, Unlock, Lock } from "lucide-react";
 import { use, useEffect, useState } from "react";
 
 export default function Chat({ params }: { params: { room: string } }) {
@@ -14,6 +14,7 @@ export default function Chat({ params }: { params: { room: string } }) {
   const [myUuid, setMyUuid] = useState("");
   const [otherMessage, setOtherMessage] = useState("");
   const [message, setMessage] = useState("");
+  const [isPrivate, setIsPrivate] = useState(false);
 
   const checkCache = () => {
     const uuid = getUserFromRoom(params.room);
@@ -90,6 +91,14 @@ export default function Chat({ params }: { params: { room: string } }) {
     });
   };
 
+  const privateRoom = () => {
+    
+    toast({
+      title: "Private room",
+      description: "This room is private",
+    });
+  };
+
   return (
     <div className="flex-1 w-full flex flex-col gap-20 items-center justify-center">
       <Button
@@ -100,11 +109,11 @@ export default function Chat({ params }: { params: { room: string } }) {
         <ChevronLeft aria-hidden />
       </Button>
       <Button
-        className="absolute top-4 right-4"
+        className="absolute top-10 right-10"
         variant="ghost"
-        onClick={copyRoomLink}
+        onClick={privateRoom}
       >
-        <Share aria-hidden />
+        <Lock aria-hidden />
       </Button>
       <div className="flex flex-col gap-2">
         <CustomTextarea
