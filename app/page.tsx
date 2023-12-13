@@ -6,6 +6,7 @@ import { cacheRoomAndUser } from "@/utils";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import './bg.css';
 
 export default function Index() {
   const supabase = createClient();
@@ -21,7 +22,19 @@ export default function Index() {
   };
 
   return (
-    <div className="flex-1 w-full flex flex-col gap-20 items-center justify-center">
+    <div className="bg flex-1 w-full flex flex-col gap-20 items-center justify-center">
+      <h1 className="title">Only Now</h1>
+      <ul className="circles">
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>        
+      </ul>
+      
       <div className="flex flex-col gap-2">
         <Input
           placeholder="Room code"
@@ -44,6 +57,8 @@ export default function Index() {
           </>
         )}
       </div>
+
     </div>
+    
   );
 }
