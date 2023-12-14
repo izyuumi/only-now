@@ -33,7 +33,7 @@ export default function Index() {
         li.style.width = `${Math.random() * 150}px`;
         li.style.height = li.style.width;
         li.style.animationDuration = `${Math.random() * 20 + 5}s`; // Adjust the range as needed
-        li.style.animationDelay = `${Math.random() * 10}s`; // Adjust the range as needed
+        li.style.animationDelay = `${Math.random() * 5}s`; // Adjust the range as needed
 
         li.classList.add('circle');
         li.addEventListener('animationend', makeAnotherCircle);
