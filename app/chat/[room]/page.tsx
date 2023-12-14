@@ -6,6 +6,7 @@ import { cacheRoomAndUser, getUserFromRoom } from "@/utils";
 import { createClient } from "@/utils/supabase/client";
 import { ChevronLeft, Share, Unlock, Lock } from "lucide-react";
 import { use, useEffect, useState } from "react";
+import '../../bg.css';
 
 export default function Chat({ params }: { params: { room: string } }) {
   const supabase = createClient();
@@ -56,8 +57,32 @@ export default function Chat({ params }: { params: { room: string } }) {
   };
 
   useEffect(() => {
+    const numCircles = 1; // Number of circles you want
+    const container = document.getElementById('circles-container');
+    if (container) {
+      for (let i = 1; i <= numCircles; i++) {
+        console.log("making circle");
+        const li: HTMLLIElement = document.createElement('li');
+        li.style.left = `${Math.random() * 100}%`;
+        li.style.width = `${Math.random() * 50}px`;
+        li.style.height = li.style.width;
+        li.style.animationDuration = `${Math.random() * 20 + 5}s`; // Adjust the range as needed
+        li.style.animationDelay = `0s`; // Adjust the range as needed
+
+        li.classList.add('circle');
+
+        // Add event listener for animation iteration
+        container.appendChild(li);
+      }
+    }
+  }
+  , [message]); // The empty dependency array ensures that this effect runs once after the initial render
+
+  useEffect(() => {
     const interval = setInterval(() => {
       console.log("subscribing to room");
+
+      
       subscribeToRoom();
     }, 500);
     return () => clearInterval(interval);
@@ -109,8 +134,14 @@ export default function Chat({ params }: { params: { room: string } }) {
 
   };
 
+  
+
   return (
-    <div className="flex-1 w-full flex flex-col gap-20 items-center justify-center">
+    <div className=" bg flex-1 w-full flex flex-col gap-20 items-center justify-center">
+            <ul className="circles" id="circles-container">
+
+     
+</ul>
       <Button
         className="absolute top-4 left-4"
         variant="ghost"
