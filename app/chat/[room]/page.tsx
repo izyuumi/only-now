@@ -5,17 +5,29 @@ import { useToast } from "@/components/ui/use-toast";
 import { cacheRoomAndUser, getUserFromRoom } from "@/utils";
 import { createClient } from "@/utils/supabase/client";
 import { ChevronLeft, Share, Unlock, Lock } from "lucide-react";
-import { use, useEffect, useState } from "react";
-import '../../bg.css';
+import { useEffect, useState } from "react";
+
+interface Message {
+  user_id: string;
+  message: string;
+}
+
+interface User {
+  user_id: string;
+  user_index: number;
+  message: string;
+}
 
 export default function Chat({ params }: { params: { room: string } }) {
   const supabase = createClient();
   const { toast } = useToast();
 
+  const channel = supabase.channel(`room:${params.room}`);
   const [myUuid, setMyUuid] = useState("");
   const [otherMessage, setOtherMessage] = useState("");
-  const [message, setMessage] = useState("");
   const [isPrivate, setIsPrivate] = useState(true);
+  const [users, setUsers] = useState<User[]>([]);
+  const [myMessage, setMyMessage] = useState("");
 
   const checkCache = () => {
     const uuid = getUserFromRoom(params.room);
@@ -42,51 +54,35 @@ export default function Chat({ params }: { params: { room: string } }) {
   };
 
   const subscribeToRoom = async () => {
-    if (!myUuid) return;
-    const { data, error } = await supabase.functions.invoke("fetchMessage", {
-      body: {
-        room: params.room,
-        uuid: myUuid,
-      },
-    });
-    if (error) console.error(error);
-    const { message } = JSON.parse(data);
-    if (message && message !== otherMessage) {
-      setOtherMessage(message);
-    }
+    channel
+      .on("broadcast", { event: "message" }, ({ payload, event }) => {
+        console.log(payload);
+        if (payload.newMessage) {
+          const newMes = payload.newMessage as Message;
+          const newMesUser = users.find(
+            (user) => user.user_id == newMes.user_id
+          );
+
+          if (newMesUser) {
+            newMesUser.message = newMes.message;
+            setUsers((prev) => [
+              ...prev.filter((user) => user.user_id !== newMes.user_id),
+              newMesUser,
+            ]);
+          } else {
+            setUsers((prev) => [
+              ...prev,
+              {
+                user_id: newMes.user_id,
+                message: newMes.message,
+                user_index: 2,
+              },
+            ]);
+          }
+        }
+      })
+      .subscribe((status) => console.log("subscribed to room", status));
   };
-
-  useEffect(() => {
-    const numCircles = 1; // Number of circles you want
-    const container = document.getElementById('circles-container');
-    if (container) {
-      for (let i = 1; i <= numCircles; i++) {
-        console.log("making circle");
-        const li: HTMLLIElement = document.createElement('li');
-        li.style.left = `${Math.random() * 100}%`;
-        li.style.width = `${Math.random() * 50}px`;
-        li.style.height = li.style.width;
-        li.style.animationDuration = `${Math.random() * 5 + 3}s`; // Adjust the range as needed
-        li.style.animationDelay = `0s`; // Adjust the range as needed
-
-        li.classList.add('circle');
-
-        // Add event listener for animation iteration
-        container.appendChild(li);
-      }
-    }
-  }
-  , [message]); // The empty dependency array ensures that this effect runs once after the initial render
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      console.log("subscribing to room");
-
-      
-      subscribeToRoom();
-    }, 500);
-    return () => clearInterval(interval);
-  }, [myUuid]);
 
   useEffect(() => {
     checkCache();
@@ -94,19 +90,22 @@ export default function Chat({ params }: { params: { room: string } }) {
 
   const sendMessage = async () => {
     if (!myUuid) return;
-    const { error } = await supabase.functions.invoke("updateMessage", {
-      body: {
-        room: params.room,
-        message,
-        author: myUuid,
+    const newMessage: Message = {
+      user_id: myUuid,
+      message: myMessage,
+    };
+    channel.send({
+      type: "broadcast",
+      event: "message",
+      payload: {
+        newMessage,
       },
     });
-    if (error) console.error(error);
   };
 
   useEffect(() => {
-    if (message) sendMessage();
-  }, [message]);
+    if (myMessage) sendMessage();
+  }, [myMessage]);
 
   const copyRoomLink = () => {
     navigator.clipboard.writeText(window.location.href);
@@ -123,25 +122,17 @@ export default function Chat({ params }: { params: { room: string } }) {
         title: "Private room",
         description: "This room is now private",
       });
-    }
-    else {
-
+    } else {
       toast({
         title: "Public room",
         description: "This room is now public",
       });
     }
-
   };
-
-  
 
   return (
     <div className=" bg flex-1 w-full flex flex-col gap-20 items-center justify-center">
-            <ul className="circles" id="circles-container">
-
-     
-</ul>
+      <ul className="circles" id="circles-container"></ul>
       <Button
         className="absolute top-4 left-4"
         variant="ghost"
@@ -164,38 +155,53 @@ export default function Chat({ params }: { params: { room: string } }) {
         {isPrivate ? <Unlock aria-hidden /> : <Lock aria-hidden />}
       </Button>
       <div className="flex flex-col gap-2">
+        {users.map((user) => (
+          <CustomTextarea
+            key={user.user_id}
+            who="other"
+            message={user.message}
+            user_index={user.user_index}
+          />
+        ))}
         <CustomTextarea
-          who="other"
-          message={otherMessage}
-          setMessage={setOtherMessage}
-          
+          who="me"
+          message={myMessage}
+          setMessage={setMyMessage}
         />
-        <CustomTextarea who="me" message={message} setMessage={setMessage} />
       </div>
     </div>
   );
 }
 
-const CustomTextarea = ({
-  who,
-  message,
-  setMessage,
-}: {
-  who: "me" | "other";
-  message: string;
+interface MeTextareaProps {
+  who: "me";
   setMessage: (message: string) => void;
-}) => {
+}
+
+interface OtherTextareaProps {
+  who: "other";
+  user_index: number;
+}
+
+type TextareaProps = (MeTextareaProps | OtherTextareaProps) & {
+  message: string;
+};
+
+const CustomTextarea = (props: TextareaProps) => {
+  const { who, message } = props;
+
+  const isMe = who === "me";
+
   return (
     <textarea
       cols={30}
       rows={3}
-      disabled={who === "other"}
-      autoFocus={who === "me"}
+      disabled={!isMe}
+      autoFocus={isMe}
       value={message}
-      onChange={(e) => setMessage(e.target.value)}
-      className="outline-none resize-none text-center text-xl bg-transparent text-white"
-      placeholder={who === "me" ? "Type here" : "Waiting for a message..."}
-
+      onChange={(e) => isMe && props.setMessage(e.target.value)}
+      className="outline-none resize-none text-center text-xl bg-transparent"
+      placeholder={isMe ? "Type here" : "Waiting for a message..."}
     >
       {message}
     </textarea>
