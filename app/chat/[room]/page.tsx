@@ -143,22 +143,24 @@ export default function Chat({ params }: { params: { room: string } }) {
      
 </ul>
       <Button
-        className="absolute top-4 left-4"
-        variant="ghost"
+        className="absolute top-4 left-4 white-button"
+        variant="link"
         onClick={() => (window.location.href = "/")}
       >
         <ChevronLeft aria-hidden />
       </Button>
       <Button
-        className="absolute top-4 right-4"
-        variant="ghost"
+        className="absolute top-4 right-4 white-button"
+        variant="link"
         onClick={copyRoomLink}
       >
         <Share aria-hidden />
       </Button>
       <Button
-        className="absolute top-4 right-14"
-        variant="ghost"
+        className="absolute top-4 right-20 white-button"
+        variant="link"
+
+        
         onClick={privateRoom}
       >
         {isPrivate ? <Unlock aria-hidden /> : <Lock aria-hidden />}

@@ -13,6 +13,14 @@
     transform: translateX(-50%);
     z-index: 4; /* Ensure this has a higher z-index than the elements with the animated background */
   }
+
+  
+  /* Define styles for the blue button */
+  .white-button {
+    background-color: transparent;
+    color: white;
+    /* Add any other styles you want for the button */
+  }
   
 
 .bg {
