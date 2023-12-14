@@ -66,7 +66,7 @@ export default function Chat({ params }: { params: { room: string } }) {
         li.style.left = `${Math.random() * 100}%`;
         li.style.width = `${Math.random() * 50}px`;
         li.style.height = li.style.width;
-        li.style.animationDuration = `${Math.random() * 20 + 5}s`; // Adjust the range as needed
+        li.style.animationDuration = `${Math.random() * 5 + 3}s`; // Adjust the range as needed
         li.style.animationDelay = `0s`; // Adjust the range as needed
 
         li.classList.add('circle');
@@ -168,6 +168,7 @@ export default function Chat({ params }: { params: { room: string } }) {
           who="other"
           message={otherMessage}
           setMessage={setOtherMessage}
+          
         />
         <CustomTextarea who="me" message={message} setMessage={setMessage} />
       </div>
@@ -192,8 +193,9 @@ const CustomTextarea = ({
       autoFocus={who === "me"}
       value={message}
       onChange={(e) => setMessage(e.target.value)}
-      className="outline-none resize-none text-center text-xl bg-transparent"
+      className="outline-none resize-none text-center text-xl bg-transparent text-white"
       placeholder={who === "me" ? "Type here" : "Waiting for a message..."}
+
     >
       {message}
     </textarea>
