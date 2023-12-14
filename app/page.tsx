@@ -23,7 +23,7 @@ export default function Index() {
   };
 
   useEffect(() => {
-    const numCircles = 10; // Number of circles you want
+    const numCircles = 15; // Number of circles you want
     const container = document.getElementById('circles-container');
     if (container) {
       for (let i = 1; i <= numCircles; i++) {
@@ -33,7 +33,7 @@ export default function Index() {
         li.style.width = `${Math.random() * 150}px`;
         li.style.height = li.style.width;
         li.style.animationDuration = `${Math.random() * 20 + 5}s`; // Adjust the range as needed
-        li.style.animationDelay = `${Math.random() * 5}s`; // Adjust the range as needed
+        li.style.animationDelay = `${Math.random() * 3}s`; // Adjust the range as needed
 
         li.classList.add('circle');
         li.addEventListener('animationend', makeAnotherCircle);
