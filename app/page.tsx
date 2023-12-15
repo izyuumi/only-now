@@ -7,6 +7,7 @@ import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
+import { generateCircle } from "@/components/ui/circles-utility";
 
 export default function Index() {
   const supabase = createClient();

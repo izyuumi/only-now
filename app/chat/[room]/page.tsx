@@ -6,6 +6,7 @@ import { cacheRoomAndUser, getUserFromRoom } from "@/utils";
 import { createClient } from "@/utils/supabase/client";
 import { ChevronLeft, Lock, Share, Unlock } from "lucide-react";
 import { useEffect, useState } from "react";
+import { generateCircle } from '../../../components/ui/circles-utility';
 import { z } from "zod";
 
 const MessageSchema = z.object({
@@ -175,7 +176,10 @@ export default function Chat({
   };
 
   useEffect(() => {
-    if (myMessage) sendMessage();
+    if (myMessage) {
+      sendMessage();
+      generateCircle();
+    }
   }, [myMessage]);
 
   /**
@@ -226,8 +230,8 @@ export default function Chat({
       >
         <ChevronLeft aria-hidden />
       </Button>
-      <div className=" white-button flex flex-row absolute top-4 right-4">
-        <Button variant="link" onClick={togglePrivateRoom}>
+      <div className="flex flex-row absolute top-4 right-4">
+        <Button className=" white-button" variant="link" onClick={togglePrivateRoom}>
           {isPrivateRoom ? <Unlock aria-hidden /> : <Lock aria-hidden />}
         </Button>
         <Button className = "white-button" variant="link" onClick={copyRoomLink}>
