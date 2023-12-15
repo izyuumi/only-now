@@ -1,16 +1,16 @@
-/* styles.css */
+html {
+  background-color: #2c2541;
+}
 
 .title {
   font-family: "GrandifloraOne";
-  font-size: 72px; /* Adjust the font size as needed */
-  font-weight: bold; /* Make the text bold */
-  letter-spacing: 4px; /* Adjust the letter spacing as needed */
+  font-size: 72px;
   color: #f4f4f4;
   position: absolute;
-  top: 10%; /* Adjust the top position as needed */
+  top: 10%;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 4; /* Ensure this has a higher z-index than the elements with the animated background */
+  z-index: 4;
 }
 
 .bg {
