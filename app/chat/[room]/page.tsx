@@ -226,7 +226,7 @@ export default function Chat({
       >
         <ChevronLeft aria-hidden />
       </Button>
-      <div className="flex flex-row absolute top-4 right-4 white-button">
+      <div className=" white-button flex flex-row absolute top-4 right-4">
         <Button variant="link" onClick={togglePrivateRoom}>
           {isPrivateRoom ? <Unlock aria-hidden /> : <Lock aria-hidden />}
         </Button>
