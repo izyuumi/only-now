@@ -312,6 +312,15 @@ const CustomTextarea = (props: TextareaProps) => {
 
   const isMe = who === "me";
 
+  const textareaRef = React.useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    let textarea = textareaRef.current;
+    if (textarea) {
+      textarea.scrollTop = textarea.scrollHeight;
+    }
+  }, [message]);
+
   return (
     <div className="relative border-gray-200 border-solid border-2 rounded-md">
       <label className="text-center text-xl absolute bottom-1 right-2 text-gray-400">
