@@ -160,25 +160,19 @@ export default function Chat({ params }: { params: { room: string } }) {
       <ul className="circles" id="circles-container"></ul>
       <Button
         className="absolute top-4 left-4"
-        variant="ghost"
+        variant="outline"
         onClick={() => (window.location.href = "/")}
       >
         <ChevronLeft aria-hidden />
       </Button>
-      <Button
-        className="absolute top-4 right-4"
-        variant="ghost"
-        onClick={copyRoomLink}
-      >
-        <Share aria-hidden />
-      </Button>
-      <Button
-        className="absolute top-4 right-14"
-        variant="ghost"
-        onClick={privateRoom}
-      >
-        {isPrivate ? <Unlock aria-hidden /> : <Lock aria-hidden />}
-      </Button>
+      <div className="flex flex-row absolute top-4 right-4">
+        <Button variant="ghost" onClick={privateRoom}>
+          {isPrivate ? <Unlock aria-hidden /> : <Lock aria-hidden />}
+        </Button>
+        <Button variant="outline" onClick={copyRoomLink}>
+          <Share aria-hidden />
+        </Button>
+      </div>
       <div className="flex flex-col gap-2">
         {Object.entries(users)
           .filter(([user_id]) => user_id !== myUuid)
