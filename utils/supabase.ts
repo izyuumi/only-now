@@ -9,70 +9,26 @@ export type Json =
 export interface Database {
   public: {
     Tables: {
-      chat_messages: {
-        Row: {
-          created_at: string
-          id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-        }
-        Relationships: []
-      }
       room: {
         Row: {
           created_at: string
           id: string
-          user_one: string | null
-          user_one_message: string
-          user_two: string | null
-          user_two_message: string
+          online_members: string[] | null
+          private: boolean
         }
         Insert: {
           created_at?: string
           id?: string
-          user_one?: string | null
-          user_one_message?: string
-          user_two?: string | null
-          user_two_message?: string
+          online_members?: string[] | null
+          private?: boolean
         }
         Update: {
           created_at?: string
           id?: string
-          user_one?: string | null
-          user_one_message?: string
-          user_two?: string | null
-          user_two_message?: string
+          online_members?: string[] | null
+          private?: boolean
         }
         Relationships: []
-      }
-      users: {
-        Row: {
-          created_at: string
-          id: string
-        }
-        Insert: {
-          created_at?: string
-          id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "users_id_fkey"
-            columns: ["id"]
-            isOneToOne: true
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          }
-        ]
       }
     }
     Views: {
