@@ -57,6 +57,7 @@ export default function Chat({ params }: { params: { room: string } }) {
     const { uuid } = JSON.parse(data);
     setMyUuid(uuid);
     cacheRoomAndUser(params.room, uuid);
+    sendJoinMessage();
     subscribeToRoom();
   };
 
@@ -214,16 +215,21 @@ const CustomTextarea = (props: TextareaProps) => {
   const isMe = who === "me";
 
   return (
-    <textarea
-      cols={30}
-      rows={3}
-      disabled={!isMe}
-      autoFocus={isMe}
-      value={message}
-      onChange={(e) => isMe && props.setMessage(e.target.value)}
-      className="outline-none resize-none text-center text-xl bg-transparent"
-      placeholder={isMe ? "Type here" : "Waiting for a message..."}
-      defaultValue={""}
-    />
+    <div className="relative border-gray-200 border-solid border-2 rounded-md">
+      <label className="text-center text-xl absolute top-0 -translate-y-1/2 left-2 text-gray-400">
+        {isMe ? "You" : `User ${props.user_index}`}
+      </label>
+      <textarea
+        cols={30}
+        rows={3}
+        disabled={!isMe}
+        autoFocus={isMe}
+        value={message}
+        onChange={(e) => isMe && props.setMessage(e.target.value)}
+        className="outline-none resize-none text-center text-xl bg-transparent"
+        placeholder={isMe ? "Type here" : "Waiting for a message..."}
+        defaultValue={""}
+      />
+    </div>
   );
 };
