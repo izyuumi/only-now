@@ -5,111 +5,118 @@ import { Input } from "@/components/ui/input";
 import { cacheRoomAndUser } from "@/utils";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
-import './bg.css';
+import "./bg.css";
 
 export default function Index() {
-  const supabase = createClient();
-  const router = useRouter();
+	const supabase = createClient();
+	const router = useRouter();
 
-  const [roomCode, setRoomCode] = useState("");
+	const [roomCode, setRoomCode] = useState("");
 
-  const createRoom = async () => {
-    const { data } = await supabase.functions.invoke("createRoom");
-    const { room, uuid } = JSON.parse(data);
-    cacheRoomAndUser(room, uuid);
-    router.push(`/chat/${room}`);
-  };
+	const createRoom = async () => {
+		const { data } = await supabase.functions.invoke("createRoom");
+		const { room, uuid } = JSON.parse(data);
+		cacheRoomAndUser(room, uuid);
+		router.push(`/chat/${room}`);
+	};
 
-  useEffect(() => {
-    const numCircles = 15; // Number of circles you want
-    const container = document.getElementById('circles-container');
-    if (container) {
-      for (let i = 1; i <= numCircles; i++) {
-        console.log("making circle");
-        const li: HTMLLIElement = document.createElement('li');
-        li.style.left = `${Math.random() * 100}%`;
-        li.style.width = `${Math.random() * 150}px`;
-        li.style.height = li.style.width;
-        li.style.animationDuration = `${Math.random() * 20 + 5}s`; // Adjust the range as needed
-        li.style.animationDelay = `${Math.random() * 3}s`; // Adjust the range as needed
+	const findRandomRoom = async () => {
+		const { data, error } = await supabase.functions.invoke("findRandomRoom");
+		if (error) {
+			console.log(error);
+			return;
+		}
+		const { room, uuid } = JSON.parse(data);
+		cacheRoomAndUser(room, uuid);
+		router.push(`/chat/${room}`);
+	};
 
-        li.classList.add('circle');
-        li.addEventListener('animationend', makeAnotherCircle);
+	useEffect(() => {
+		const numCircles = 15; // Number of circles you want
+		const container = document.getElementById("circles-container");
+		if (container) {
+			for (let i = 1; i <= numCircles; i++) {
+				console.log("making circle");
+				const li: HTMLLIElement = document.createElement("li");
+				li.style.left = `${Math.random() * 100}%`;
+				li.style.width = `${Math.random() * 150}px`;
+				li.style.height = li.style.width;
+				li.style.animationDuration = `${Math.random() * 20 + 5}s`; // Adjust the range as needed
+				li.style.animationDelay = `${Math.random() * 3}s`; // Adjust the range as needed
 
-        // Add event listener for animation iteration
-        container.appendChild(li);
-      }
-    }
-  }, []); // The empty dependency array ensures that this effect runs once after the initial render
+				li.classList.add("circle");
+				li.addEventListener("animationend", makeAnotherCircle);
 
-  const makeAnotherCircle = (e: AnimationEvent) => {
-    const numCircles = 1; // Number of circles you want
-    const container = document.getElementById('circles-container');
-    if (container) {
-      for (let i = 1; i <= numCircles; i++) {
-        console.log("making circle");
-        const li: HTMLLIElement = document.createElement('li');
-        li.style.left = `${Math.random() * 100}%`;
-        li.style.width = `${Math.random() * 150}px`;
-        li.style.height = li.style.width;
-        li.style.animationDuration = `${Math.random() * 20 + 5}s`; // Adjust the range as needed
-        li.style.animationDelay = `1s`; // Adjust the range as needed
+				// Add event listener for animation iteration
+				container.appendChild(li);
+			}
+		}
+	}, []); // The empty dependency array ensures that this effect runs once after the initial render
 
-        li.classList.add('circle');
-        li.addEventListener('animationend', makeAnotherCircle);
+	const makeAnotherCircle = (e: AnimationEvent) => {
+		const numCircles = 1; // Number of circles you want
+		const container = document.getElementById("circles-container");
+		if (container) {
+			for (let i = 1; i <= numCircles; i++) {
+				console.log("making circle");
+				const li: HTMLLIElement = document.createElement("li");
+				li.style.left = `${Math.random() * 100}%`;
+				li.style.width = `${Math.random() * 150}px`;
+				li.style.height = li.style.width;
+				li.style.animationDuration = `${Math.random() * 20 + 5}s`; // Adjust the range as needed
+				li.style.animationDelay = `1s`; // Adjust the range as needed
 
-        // Add event listener for animation iteration
-        container.appendChild(li);
-      }
-    }
-  };
+				li.classList.add("circle");
+				li.addEventListener("animationend", makeAnotherCircle);
 
-  const updateCircleStyles = (circle: HTMLLIElement) => {
-    console.log('updating circle styles');
-     circle.style.left = `${Math.random() * 100}%`;
-     circle.style.width = `${Math.random() * 150}px`;
-     circle.style.height = circle.style.width;
-     circle.style.animationDuration = `${Math.random() * 20 + 5}s`;
-     circle.style.animationDelay = `1s`;
+				// Add event listener for animation iteration
+				container.appendChild(li);
+			}
+		}
+	};
 
-  };
+	const updateCircleStyles = (circle: HTMLLIElement) => {
+		console.log("updating circle styles");
+		circle.style.left = `${Math.random() * 100}%`;
+		circle.style.width = `${Math.random() * 150}px`;
+		circle.style.height = circle.style.width;
+		circle.style.animationDuration = `${Math.random() * 20 + 5}s`;
+		circle.style.animationDelay = `1s`;
+	};
 
+	return (
+		<div className="bg flex-1 w-full flex flex-col gap-20 items-center justify-center">
+			<h1 className="title">Only Now</h1>
+			<ul className="circles" id="circles-container"></ul>
 
-  return (
-    <div className="bg flex-1 w-full flex flex-col gap-20 items-center justify-center">
-      <h1 className="title">Only Now</h1>
-      <ul className="circles" id="circles-container">
-
-     
-      </ul>
-      
-      <div className="flex flex-col gap-2">
-        <Input
-          placeholder="Room code"
-          autoFocus
-          value={roomCode}
-          onChange={(e) => setRoomCode(e.target.value)}
-        />
-        {roomCode ? (
-          <Button
-            onClick={() => {
-              console.log("join room");
-            }}
-          >
-            Join room
-          </Button>
-        ) : (
-          <>
-            <Button onClick={createRoom}>Create a room</Button>
-            <Button>Join a random room</Button>
-          </>
-        )}
-      </div>
-
-    </div>
-    
-  );
+			<div className="flex flex-col gap-2">
+				<Input
+					placeholder="Room code"
+					autoFocus
+					value={roomCode}
+					onChange={(e) => setRoomCode(e.target.value)}
+				/>
+				{roomCode
+					? (
+						<Button
+							onClick={() => {
+								console.log("join room");
+							}}
+						>
+							Join room
+						</Button>
+					)
+					: (
+						<>
+							<Button onClick={createRoom}>Create a room</Button>
+							<Button onClick={findRandomRoom} variant="outline">
+								Join a random room
+							</Button>
+						</>
+					)}
+			</div>
+		</div>
+	);
 }
-
