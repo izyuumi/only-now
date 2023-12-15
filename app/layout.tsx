@@ -1,5 +1,6 @@
 import { GeistSans } from "geist/font/sans";
 import "./globals.css";
+import "./font.css";
 import { Toaster } from "@/components/ui/toaster";
 
 const defaultUrl = process.env.VERCEL_URL
@@ -14,9 +15,9 @@ export const metadata = {
 
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   return (
     <html lang="en" className={GeistSans.className}>
       <body className="bg-background text-foreground">

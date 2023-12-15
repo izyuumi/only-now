@@ -74,15 +74,3 @@
     @apply bg-background text-foreground;
   }
 }
-
-@font-face {
-  font-family: "GrandifloraOne";
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url("/fonts/GrandifloraOne.ttf") format("truetype");
-}
-
-html {
-  font-family: "GrandifloraOne", sans-serif;
-}

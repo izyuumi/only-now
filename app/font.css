@@ -1,0 +1,22 @@
+@font-face {
+  font-family: "GrandifloraOne";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/GrandifloraOne.ttf") format("truetype");
+}
+
+html {
+  font-family: "GrandifloraOne", sans-serif;
+}
+
+.title {
+  font-family: "GrandifloraOne", sans-serif;
+  font-size: 72px;
+  color: #f4f4f4;
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+}
