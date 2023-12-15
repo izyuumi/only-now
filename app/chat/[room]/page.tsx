@@ -5,6 +5,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { cacheRoomAndUser, getUserFromRoom } from "@/utils";
 import { createClient } from "@/utils/supabase/client";
 import { ChevronLeft, Lock, Share, Unlock } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { z } from "zod";
 
@@ -31,6 +32,7 @@ export default function Chat({
 }: Readonly<{ params: { room: string } }>) {
   const supabase = createClient();
   const { toast } = useToast();
+  const router = useRouter();
 
   const channel = supabase.channel(`room:${params.room}`);
   const [myUuid, setMyUuid] = useState("");
@@ -216,8 +218,13 @@ export default function Chat({
     });
   };
 
-  const disconnectFromRoom = async () => {
+  const disconnectFromRoom = async (ev?: BeforeUnloadEvent) => {
     if (!myUuid) return;
+    if (ev) {
+      ev.preventDefault();
+      ev.returnValue = "";
+    }
+    channel.unsubscribe();
     await supabase.functions.invoke("disconnectFromRoom", {
       body: {
         room: params.room,
@@ -227,10 +234,13 @@ export default function Chat({
   };
 
   useEffect(() => {
+    window.addEventListener("beforeunload", disconnectFromRoom);
+    window.addEventListener("unload", disconnectFromRoom);
     return () => {
-      disconnectFromRoom();
+      window.removeEventListener("beforeunload", disconnectFromRoom);
+      window.removeEventListener("unload", disconnectFromRoom);
     };
-  }, []);
+  });
 
   return (
     <div className=" bg flex-1 w-full flex flex-col gap-20 items-center justify-center">
@@ -238,7 +248,10 @@ export default function Chat({
       <Button
         className="absolute top-4 left-4"
         variant="outline"
-        onClick={() => (window.location.href = "/")}
+        onClick={() => {
+          disconnectFromRoom();
+          router.push("/");
+        }}
       >
         <ChevronLeft aria-hidden />
       </Button>

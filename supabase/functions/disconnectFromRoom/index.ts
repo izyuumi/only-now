@@ -15,7 +15,7 @@ serve(async (req) => {
       .from("room")
       .select("id,online_members")
       .eq("id", room)
-      .single();
+      .maybeSingle();
     if (error) throw new Error(error.message);
     if (!roomData) return new Response("room not found", { status: 404 });
     const { online_members } = roomData;
