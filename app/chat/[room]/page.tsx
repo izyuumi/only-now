@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { cacheRoomAndUser, getUserFromRoom } from "@/utils";
+import { cacheRoomAndUser, getUserFromRoom, removeUserFromRoom } from "@/utils";
 import { createClient } from "@/utils/supabase/client";
 import { ChevronLeft, Lock, Share, Unlock } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -228,6 +228,7 @@ export default function Chat({
       ev.preventDefault();
       ev.returnValue = "";
     }
+    removeUserFromRoom(params.room);
     channel.unsubscribe();
     await supabase.functions.invoke("disconnectFromRoom", {
       body: {
