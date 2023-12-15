@@ -94,12 +94,19 @@ export default function Index() {
 				<Input
 					placeholder="Room code"
 					autoFocus
+					className="bg-gray-300"
 					value={roomCode}
 					onChange={(e) => setRoomCode(e.target.value)}
+					onKeyDown={(e) => {
+						if (e.key === "Enter") {
+							console.log("join room");
+						}
+					}}
 				/>
 				{roomCode
 					? (
 						<Button
+							className="bg-violet-400"
 							onClick={() => {
 								console.log("join room");
 							}}
@@ -109,8 +116,14 @@ export default function Index() {
 					)
 					: (
 						<>
-							<Button onClick={createRoom}>Create a room</Button>
-							<Button onClick={findRandomRoom} variant="outline">
+							<Button onClick={createRoom} className="bg-sky-800">
+								Create a room
+							</Button>
+							<Button
+								onClick={findRandomRoom}
+								variant="outline"
+								className="bg-green-200"
+							>
 								Join a random room
 							</Button>
 						</>
