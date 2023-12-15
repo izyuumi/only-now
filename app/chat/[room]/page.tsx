@@ -26,16 +26,27 @@ const NewUserMessageSchema = z.object({
 });
 type NewUserMessage = z.infer<typeof NewUserMessageSchema>;
 
-export default function Chat({ params }: { params: { room: string } }) {
+export default function Chat({
+  params,
+}: Readonly<{ params: { room: string } }>) {
   const supabase = createClient();
   const { toast } = useToast();
 
   const channel = supabase.channel(`room:${params.room}`);
   const [myUuid, setMyUuid] = useState("");
-  const [isPrivate, setIsPrivate] = useState(true);
+  const [isPrivateRoom, setIsPrivateRoom] = useState(true);
   const [users, setUsers] = useState<Record<string, User>>({});
   const [myMessage, setMyMessage] = useState("");
 
+  /**
+   * Checks if the room is cached.
+   * If the room is cached, it subscribes to the room.
+   * If the room is not cached, it connects to the room.
+   * @returns nothing
+   * @sideeffect sets `myUuid`
+   * @sideeffect runs `subscribeToRoom`
+   * @sideeffect runs `connectToRoom`
+   */
   const checkCache = () => {
     const uuid = getUserFromRoom(params.room);
     if (uuid) {
@@ -46,6 +57,15 @@ export default function Chat({ params }: { params: { room: string } }) {
     }
   };
 
+  /**
+   * Connects to the room from the room code in the URL.
+   * @returns nothing
+   * @sideeffect shows an error message if something goes wrong
+   * @sideeffect sets `myUuid`
+   * @sideeffect runs `cacheRoomAndUser`
+   * @sideeffect runs `sendJoinMessage`
+   * @sideeffect runs `subscribeToRoom`
+   */
   const connectToRoom = async () => {
     if (myUuid) return;
     const { data, error } = await supabase.functions.invoke("connectToRoom", {
@@ -53,7 +73,14 @@ export default function Chat({ params }: { params: { room: string } }) {
         room: params.room,
       },
     });
-    if (error) console.error(error);
+    if (error) {
+      toast({
+        title: "Something went wrong. Please try again later.",
+        description: error.message,
+      });
+      console.error(error);
+      return;
+    }
     const { uuid } = JSON.parse(data);
     setMyUuid(uuid);
     cacheRoomAndUser(params.room, uuid);
@@ -61,6 +88,11 @@ export default function Chat({ params }: { params: { room: string } }) {
     subscribeToRoom();
   };
 
+  /**
+   * Sends a join message to the channel associated with the room.
+   * @returns nothing
+   * @sideeffect other users will receive broadcasted message
+   */
   const sendJoinMessage = async () => {
     if (!myUuid) return;
     channel.send({
@@ -73,6 +105,11 @@ export default function Chat({ params }: { params: { room: string } }) {
     });
   };
 
+  /**
+   * Subscribes to the channel associated with the room.
+   * @returns nothing
+   * @sideeffect shows a toast
+   */
   const subscribeToRoom = async () => {
     channel
       .on("broadcast", { event: "message" }, ({ payload }) => {
@@ -114,11 +151,19 @@ export default function Chat({ params }: { params: { room: string } }) {
     checkCache();
   }, []);
 
+  /**
+   * Sends a message to the channel associated with the room.
+   * @returns nothing
+   * @sideeffect updates `myMessage` to only last line of the message
+   */
   const sendMessage = async () => {
     if (!myUuid) return;
+    const lastLine = myMessage.split("\n").pop();
+    if (!lastLine) return;
+    setMyMessage(lastLine);
     const newMessage: Message = {
       user_id: myUuid,
-      message: myMessage,
+      message: lastLine,
     };
     channel.send({
       type: "broadcast",
@@ -133,6 +178,12 @@ export default function Chat({ params }: { params: { room: string } }) {
     if (myMessage) sendMessage();
   }, [myMessage]);
 
+  /**
+   * Copies the room link to the clipboard.
+   * @returns nothing
+   * @sideeffect shows a toast
+   * @sideeffect copies the room link to the clipboard
+   */
   const copyRoomLink = () => {
     navigator.clipboard.writeText(window.location.href);
     toast({
@@ -141,19 +192,28 @@ export default function Chat({ params }: { params: { room: string } }) {
     });
   };
 
-  const privateRoom = () => {
-    setIsPrivate(!isPrivate);
-    if (isPrivate) {
+  /**
+   * Toggles the room between private and public.
+   * If the room is private, it makes it public.
+   * If the room is public, it makes it private.
+   * @returns nothing
+   * @sideeffect shows a toast
+   * @sideeffect sets the isPrivateRoom state
+   * @sideeffect updates the room in the database
+   */
+  const togglePrivateRoom = () => {
+    setIsPrivateRoom((prev) => !prev);
+    if (isPrivateRoom) {
       toast({
         title: "Private room",
         description: "This room is now private. New random users cannot join.",
       });
-    } else {
-      toast({
-        title: "Public room",
-        description: "This room is now public. Random users can join.",
-      });
+      return;
     }
+    toast({
+      title: "Public room",
+      description: "This room is now public. Random users can join.",
+    });
   };
 
   return (
@@ -167,8 +227,8 @@ export default function Chat({ params }: { params: { room: string } }) {
         <ChevronLeft aria-hidden />
       </Button>
       <div className="flex flex-row absolute top-4 right-4">
-        <Button variant="ghost" onClick={privateRoom}>
-          {isPrivate ? <Unlock aria-hidden /> : <Lock aria-hidden />}
+        <Button variant="outline" onClick={togglePrivateRoom}>
+          {isPrivateRoom ? <Unlock aria-hidden /> : <Lock aria-hidden />}
         </Button>
         <Button variant="outline" onClick={copyRoomLink}>
           <Share aria-hidden />
@@ -216,7 +276,7 @@ const CustomTextarea = (props: TextareaProps) => {
 
   return (
     <div className="relative border-gray-200 border-solid border-2 rounded-md">
-      <label className="text-center text-xl absolute top-0 -translate-y-1/2 left-2 text-gray-400">
+      <label className="text-center text-xl absolute bottom-1 right-2 text-gray-400">
         {isMe ? "You" : `User ${props.user_index}`}
       </label>
       <textarea
@@ -226,7 +286,7 @@ const CustomTextarea = (props: TextareaProps) => {
         autoFocus={isMe}
         value={message}
         onChange={(e) => isMe && props.setMessage(e.target.value)}
-        className="outline-none resize-none text-center text-xl bg-transparent"
+        className="outline-none resize-none text-center text-xl bg-transparent text-slate-200"
         placeholder={isMe ? "Type here" : "Waiting for a message..."}
         defaultValue={""}
       />
