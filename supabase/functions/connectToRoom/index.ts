@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+
 import { adminSupabase, corsHeaders } from "../_shared/cors.ts";
-import { checkRoomExists, checkRoomHasEmptySlot } from "../_shared/utils.ts";
+import { checkRoomExists, deleteRoom } from "../_shared/utils.ts";
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -8,19 +9,22 @@ serve(async (req) => {
   }
   try {
     const { room } = await req.json();
-    // check room is non-empty strings
     if (!room) {
       return new Response("room is required", {
         status: 400,
       });
     }
+
     const roomData = await checkRoomExists(room);
-    const user_index = checkRoomHasEmptySlot(roomData);
+    if (!roomData.online_members) {
+      await deleteRoom(room);
+      throw new Error("room has no online members");
+    }
 
     const newUuid = crypto.randomUUID();
     const { error } = await adminSupabase.from("room").upsert({
       id: room,
-      [user_index]: newUuid,
+      online_members: [...roomData.online_members, newUuid],
     });
     if (error) {
       throw new Error(error.message);
@@ -30,7 +34,7 @@ serve(async (req) => {
       JSON.stringify({
         uuid: newUuid,
       }),
-      { headers: corsHeaders }
+      { headers: corsHeaders },
     );
   } catch (error) {
     console.error(error);
