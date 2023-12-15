@@ -7,7 +7,7 @@ import { createClient } from "@/utils/supabase/client";
 import { ChevronLeft, Lock, Share, Unlock } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { generateCircle } from '../../../components/ui/circles-utility';
+import { generateCircle } from "../../../components/ui/circles-utility";
 import { z } from "zod";
 
 const MessageSchema = z.object({
@@ -260,10 +260,14 @@ export default function Chat({
         <ChevronLeft aria-hidden />
       </Button>
       <div className="flex flex-row absolute top-4 right-4">
-        <Button className=" white-button" variant="link" onClick={togglePrivateRoom}>
-          {isPrivateRoom ? <Unlock aria-hidden /> : <Lock aria-hidden />}
+        <Button
+          className=" white-button"
+          variant="link"
+          onClick={togglePrivateRoom}
+        >
+          {isPrivateRoom ? <Lock aria-hidden /> : <Unlock aria-hidden />}
         </Button>
-        <Button className = "white-button" variant="link" onClick={copyRoomLink}>
+        <Button className="white-button" variant="link" onClick={copyRoomLink}>
           <Share aria-hidden />
         </Button>
       </div>
