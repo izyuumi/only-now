@@ -4,19 +4,49 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { cacheRoomAndUser, getUserFromRoom } from "@/utils";
 import { createClient } from "@/utils/supabase/client";
-import { ChevronLeft, Share, Unlock, Lock } from "lucide-react";
-import { use, useEffect, useState } from "react";
-import '../../bg.css';
+import { ChevronLeft, Lock, Share, Unlock } from "lucide-react";
+import { useEffect, useState } from "react";
+import { z } from "zod";
 
-export default function Chat({ params }: { params: { room: string } }) {
+const MessageSchema = z.object({
+  user_id: z.string(),
+  message: z.string(),
+});
+type Message = z.infer<typeof MessageSchema>;
+
+const UserSchema = z.object({
+  user_index: z.number(),
+  message: z.string(),
+});
+type User = z.infer<typeof UserSchema>;
+
+const NewUserMessageSchema = z.object({
+  user_id: z.string(),
+  user_index: z.number(),
+});
+type NewUserMessage = z.infer<typeof NewUserMessageSchema>;
+
+export default function Chat({
+  params,
+}: Readonly<{ params: { room: string } }>) {
   const supabase = createClient();
   const { toast } = useToast();
 
+  const channel = supabase.channel(`room:${params.room}`);
   const [myUuid, setMyUuid] = useState("");
-  const [otherMessage, setOtherMessage] = useState("");
-  const [message, setMessage] = useState("");
-  const [isPrivate, setIsPrivate] = useState(true);
+  const [isPrivateRoom, setIsPrivateRoom] = useState(true);
+  const [users, setUsers] = useState<Record<string, User>>({});
+  const [myMessage, setMyMessage] = useState("");
 
+  /**
+   * Checks if the room is cached.
+   * If the room is cached, it subscribes to the room.
+   * If the room is not cached, it connects to the room.
+   * @returns nothing
+   * @sideeffect sets `myUuid`
+   * @sideeffect runs `subscribeToRoom`
+   * @sideeffect runs `connectToRoom`
+   */
   const checkCache = () => {
     const uuid = getUserFromRoom(params.room);
     if (uuid) {
@@ -27,6 +57,15 @@ export default function Chat({ params }: { params: { room: string } }) {
     }
   };
 
+  /**
+   * Connects to the room from the room code in the URL.
+   * @returns nothing
+   * @sideeffect shows an error message if something goes wrong
+   * @sideeffect sets `myUuid`
+   * @sideeffect runs `cacheRoomAndUser`
+   * @sideeffect runs `sendJoinMessage`
+   * @sideeffect runs `subscribeToRoom`
+   */
   const connectToRoom = async () => {
     if (myUuid) return;
     const { data, error } = await supabase.functions.invoke("connectToRoom", {
@@ -34,80 +73,117 @@ export default function Chat({ params }: { params: { room: string } }) {
         room: params.room,
       },
     });
-    if (error) console.error(error);
+    if (error) {
+      toast({
+        title: "Something went wrong. Please try again later.",
+        description: error.message,
+      });
+      console.error(error);
+      return;
+    }
     const { uuid } = JSON.parse(data);
     setMyUuid(uuid);
     cacheRoomAndUser(params.room, uuid);
+    sendJoinMessage();
     subscribeToRoom();
   };
 
-  const subscribeToRoom = async () => {
+  /**
+   * Sends a join message to the channel associated with the room.
+   * @returns nothing
+   * @sideeffect other users will receive broadcasted message
+   */
+  const sendJoinMessage = async () => {
     if (!myUuid) return;
-    const { data, error } = await supabase.functions.invoke("fetchMessage", {
-      body: {
-        room: params.room,
-        uuid: myUuid,
+    channel.send({
+      type: "broadcast",
+      event: "new_user",
+      payload: {
+        user_id: myUuid,
+        user_index: Object.keys(users).length,
       },
     });
-    if (error) console.error(error);
-    const { message } = JSON.parse(data);
-    if (message && message !== otherMessage) {
-      setOtherMessage(message);
-    }
   };
 
-  useEffect(() => {
-    const numCircles = 1; // Number of circles you want
-    const container = document.getElementById('circles-container');
-    if (container) {
-      for (let i = 1; i <= numCircles; i++) {
-        console.log("making circle");
-        const li: HTMLLIElement = document.createElement('li');
-        li.style.left = `${Math.random() * 100}%`;
-        li.style.width = `${Math.random() * 50}px`;
-        li.style.height = li.style.width;
-        li.style.animationDuration = `${Math.random() * 5 + 3}s`; // Adjust the range as needed
-        li.style.animationDelay = `0s`; // Adjust the range as needed
-
-        li.classList.add('circle');
-
-        // Add event listener for animation iteration
-        container.appendChild(li);
-      }
-    }
-  }
-  , [message]); // The empty dependency array ensures that this effect runs once after the initial render
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      console.log("subscribing to room");
-
-      
-      subscribeToRoom();
-    }, 500);
-    return () => clearInterval(interval);
-  }, [myUuid]);
+  /**
+   * Subscribes to the channel associated with the room.
+   * @returns nothing
+   * @sideeffect shows a toast
+   */
+  const subscribeToRoom = async () => {
+    channel
+      .on("broadcast", { event: "message" }, ({ payload }) => {
+        if (MessageSchema.safeParse(payload.newMessage).success) {
+          const newMes = payload.newMessage as Message;
+          setUsers((prev) => ({
+            ...prev,
+            [newMes.user_id]: {
+              message: newMes.message,
+              user_index: prev[newMes.user_id]?.user_index ?? 0,
+            },
+          }));
+        }
+      })
+      .on("broadcast", { event: "new_user" }, ({ payload }) => {
+        if (NewUserMessageSchema.safeParse(payload).success) {
+          const newUser = payload as NewUserMessage;
+          setUsers((prev) => ({
+            ...prev,
+            [newUser.user_id]: {
+              message: "",
+              user_index: newUser.user_index,
+            },
+          }));
+        }
+      })
+      .subscribe((status) => {
+        if (status === "SUBSCRIBED") {
+          toast({
+            title: "Connected to room",
+            description: "You can now chat in this room",
+            className: "bg-green-100",
+          });
+        }
+      });
+  };
 
   useEffect(() => {
     checkCache();
   }, []);
 
+  /**
+   * Sends a message to the channel associated with the room.
+   * @returns nothing
+   * @sideeffect updates `myMessage` to only last line of the message
+   */
   const sendMessage = async () => {
     if (!myUuid) return;
-    const { error } = await supabase.functions.invoke("updateMessage", {
-      body: {
-        room: params.room,
-        message,
-        author: myUuid,
+    const lastLine = myMessage.split("\n").pop();
+    if (!lastLine) return;
+    setMyMessage(lastLine);
+    const newMessage: Message = {
+      user_id: myUuid,
+      message: lastLine,
+    };
+    channel.send({
+      type: "broadcast",
+      event: "message",
+      payload: {
+        newMessage,
       },
     });
-    if (error) console.error(error);
   };
 
   useEffect(() => {
-    if (message) sendMessage();
-  }, [message]);
+    if (myMessage) sendMessage();
+  }, [myMessage]);
 
+  /**
+   * Copies the room link to the clipboard.
+   * @returns nothing
+   * @sideeffect shows a toast
+   * @sideeffect copies the room link to the clipboard
+   */
   const copyRoomLink = () => {
     navigator.clipboard.writeText(window.location.href);
     toast({
@@ -116,32 +192,33 @@ export default function Chat({ params }: { params: { room: string } }) {
     });
   };
 
-  const privateRoom = () => {
-    setIsPrivate(!isPrivate);
-    if (isPrivate) {
+  /**
+   * Toggles the room between private and public.
+   * If the room is private, it makes it public.
+   * If the room is public, it makes it private.
+   * @returns nothing
+   * @sideeffect shows a toast
+   * @sideeffect sets the isPrivateRoom state
+   * @sideeffect updates the room in the database
+   */
+  const togglePrivateRoom = () => {
+    setIsPrivateRoom((prev) => !prev);
+    if (isPrivateRoom) {
       toast({
         title: "Private room",
-        description: "This room is now private",
+        description: "This room is now private. New random users cannot join.",
       });
+      return;
     }
-    else {
-
-      toast({
-        title: "Public room",
-        description: "This room is now public",
-      });
-    }
-
+    toast({
+      title: "Public room",
+      description: "This room is now public. Random users can join.",
+    });
   };
-
-  
 
   return (
     <div className=" bg flex-1 w-full flex flex-col gap-20 items-center justify-center">
-            <ul className="circles" id="circles-container">
-
-     
-</ul>
+      <ul className="circles" id="circles-container"></ul>
       <Button
         className="absolute top-4 left-4 white-button"
         variant="link"
@@ -149,57 +226,70 @@ export default function Chat({ params }: { params: { room: string } }) {
       >
         <ChevronLeft aria-hidden />
       </Button>
-      <Button
-        className="absolute top-4 right-4 white-button"
-        variant="link"
-        onClick={copyRoomLink}
-      >
-        <Share aria-hidden />
-      </Button>
-      <Button
-        className="absolute top-4 right-20 white-button"
-        variant="link"
-
-        
-        onClick={privateRoom}
-      >
-        {isPrivate ? <Unlock aria-hidden /> : <Lock aria-hidden />}
-      </Button>
+      <div className="flex flex-row absolute top-4 right-4 white-button">
+        <Button variant="link" onClick={togglePrivateRoom}>
+          {isPrivateRoom ? <Unlock aria-hidden /> : <Lock aria-hidden />}
+        </Button>
+        <Button className = "white-button" variant="link" onClick={copyRoomLink}>
+          <Share aria-hidden />
+        </Button>
+      </div>
       <div className="flex flex-col gap-2">
+        {Object.entries(users)
+          .filter(([user_id]) => user_id !== myUuid)
+          .map(([user_id, user]) => (
+            <CustomTextarea
+              key={user_id}
+              who="other"
+              message={user.message}
+              user_index={user.user_index}
+            />
+          ))}
         <CustomTextarea
-          who="other"
-          message={otherMessage}
-          setMessage={setOtherMessage}
-          
+          who="me"
+          message={myMessage}
+          setMessage={setMyMessage}
         />
-        <CustomTextarea who="me" message={message} setMessage={setMessage} />
       </div>
     </div>
   );
 }
 
-const CustomTextarea = ({
-  who,
-  message,
-  setMessage,
-}: {
-  who: "me" | "other";
-  message: string;
+interface MeTextareaProps {
+  who: "me";
   setMessage: (message: string) => void;
-}) => {
-  return (
-    <textarea
-      cols={30}
-      rows={3}
-      disabled={who === "other"}
-      autoFocus={who === "me"}
-      value={message}
-      onChange={(e) => setMessage(e.target.value)}
-      className="outline-none resize-none text-center text-xl bg-transparent text-white"
-      placeholder={who === "me" ? "Type here" : "Waiting for a message..."}
+}
 
-    >
-      {message}
-    </textarea>
+interface OtherTextareaProps {
+  who: "other";
+  user_index: number;
+}
+
+type TextareaProps = (MeTextareaProps | OtherTextareaProps) & {
+  message: string;
+};
+
+const CustomTextarea = (props: TextareaProps) => {
+  const { who, message } = props;
+
+  const isMe = who === "me";
+
+  return (
+    <div className="relative border-gray-200 border-solid border-2 rounded-md">
+      <label className="text-center text-xl absolute bottom-1 right-2 text-gray-400">
+        {isMe ? "You" : `User ${props.user_index}`}
+      </label>
+      <textarea
+        cols={30}
+        rows={3}
+        disabled={!isMe}
+        autoFocus={isMe}
+        value={message}
+        onChange={(e) => isMe && props.setMessage(e.target.value)}
+        className="outline-none resize-none text-center text-xl bg-transparent text-slate-200"
+        placeholder={isMe ? "Type here" : "Waiting for a message..."}
+        defaultValue={""}
+      />
+    </div>
   );
 };
