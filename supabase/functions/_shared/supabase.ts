@@ -12,18 +12,21 @@ export interface Database {
       room: {
         Row: {
           created_at: string
+          creator: string | null
           id: string
           online_members: string[] | null
           private: boolean
         }
         Insert: {
           created_at?: string
+          creator?: string | null
           id?: string
           online_members?: string[] | null
           private?: boolean
         }
         Update: {
           created_at?: string
+          creator?: string | null
           id?: string
           online_members?: string[] | null
           private?: boolean
