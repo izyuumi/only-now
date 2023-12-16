@@ -17,8 +17,19 @@ export default function Index() {
   const [roomCode, setRoomCode] = useState("");
 
   useEffect(() => {
+
     initializeBackgroundAnimation();
+    
   }, []);
+
+  useEffect(() => {
+    toast({
+      title: "OnlyNow",
+      description: "A chat app that allows real-time anonymous communication with people around the world",
+    });
+  }, []);
+
+
 
   /**
    * Creates a room and joins it.
@@ -95,6 +106,7 @@ export default function Index() {
   return (
     <div className="bg flex-1 w-full flex flex-col gap-20 items-center justify-center">
       <h1 className="title">OnlyNow</h1>
+      <h2 className="subtitle">A chat site that allows real-time anonymous communication with people around the world</h2>
       <ul className="box" id="box-container"></ul>
       <div className="flex flex-col gap-2 w-64 max-w-[90%]">
         <Input

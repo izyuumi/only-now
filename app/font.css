@@ -20,3 +20,27 @@ html {
   transform: translateX(-50%);
   z-index: 10;
 }
+
+.subtitle {
+  font-family: "GrandifloraOne", sans-serif;
+  font-size: 18px;
+  color: #f4f4f4;
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  animation: fadeOut 10s ease-in-out forwards;
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}

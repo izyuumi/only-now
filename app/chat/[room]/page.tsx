@@ -281,7 +281,7 @@ export default function Chat({
 
   return (
     <div className=" bg flex-1 w-full flex flex-col gap-20 items-center justify-center">
-      <ul className="circles" id="circles-container"></ul>
+      <ul className="box" id="box-container"></ul>
       <Button
         className="absolute top-4 left-4 white-button"
         variant="link"

@@ -1,8 +1,8 @@
 // circlesUtility.ts
 
 export function generateCircle(): void {
-    const numCircles = 1; // Number of circles you want
-    const container = document.getElementById('circles-container');
+    const numCircles = 1; 
+    const container = document.getElementById('box-container');
   
     if (container) {
       for (let i = 1; i <= numCircles; i++) {
@@ -11,10 +11,10 @@ export function generateCircle(): void {
         li.style.left = `${Math.random() * 100}%`;
         li.style.width = `${Math.random() * 50}px`;
         li.style.height = li.style.width;
-        li.style.animationDuration = `${Math.random() * 20 + 5}s`; // Adjust the range as needed
-        li.style.animationDelay = `0s`; // Adjust the range as needed
+        li.style.animationDuration = `${Math.random() * 20 + 5}s`; 
+        li.style.animationDelay = `0s`;
   
-        li.classList.add('circle');
+        li.classList.add('box');
   
         // Add event listener for animation iteration
         container.appendChild(li);
