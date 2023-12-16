@@ -40,6 +40,7 @@ export default function Chat({
   const [isPrivateRoom, setIsPrivateRoom] = useState(true);
   const [users, setUsers] = useState<Record<string, User>>({});
   const [myMessage, setMyMessage] = useState("");
+  const [isHost, setIsHost] = useState(false);
 
   /**
    * Checks if the room is cached.
@@ -57,6 +58,21 @@ export default function Chat({
       subscribeToRoom();
     } else {
       connectToRoom();
+    }
+  };
+
+  /**
+   * Checks if the user is the host of the room.
+   * @returns nothing
+   * @sideeffect sets `isHost`
+   * @sideeffect removes URL params
+   */
+  const checkIsHost = async () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get("host") === "true") {
+      setIsHost(true);
+      urlParams.delete("host");
+      window.history.replaceState({}, "", `${window.location.pathname}`);
     }
   };
 
@@ -152,6 +168,7 @@ export default function Chat({
 
   useEffect(() => {
     checkCache();
+    checkIsHost();
   }, []);
 
   /**
@@ -206,19 +223,35 @@ export default function Chat({
    * @sideeffect sets the isPrivateRoom state
    * @sideeffect updates the room in the database
    */
-  const togglePrivateRoom = () => {
-    setIsPrivateRoom((prev) => !prev);
-    if (isPrivateRoom) {
+  const togglePrivateRoom = async () => {
+    const { data, error } = await supabase.functions.invoke("setVisibility", {
+      body: {
+        room: params.room,
+        uuid: myUuid,
+        isPrivate: !isPrivateRoom,
+      },
+    });
+    console.log(data);
+    if (error) {
+      toast({
+        title: "Something went wrong. Please try again later.",
+        description: error.message,
+      });
+      return;
+    }
+    if (!isPrivateRoom) {
       toast({
         title: "Private room",
         description: "This room is now private. New random users cannot join.",
       });
+      setIsPrivateRoom(true);
       return;
     }
     toast({
       title: "Public room",
       description: "This room is now public. Random users can join.",
     });
+    setIsPrivateRoom(false);
   };
 
   const disconnectFromRoom = async (ev?: BeforeUnloadEvent) => {
@@ -260,13 +293,15 @@ export default function Chat({
         <ChevronLeft aria-hidden />
       </Button>
       <div className="flex flex-row absolute top-4 right-4">
-        <Button
-          className=" white-button"
-          variant="link"
-          onClick={togglePrivateRoom}
-        >
-          {isPrivateRoom ? <Lock aria-hidden /> : <Unlock aria-hidden />}
-        </Button>
+        {isHost && (
+          <Button
+            className=" white-button"
+            variant="link"
+            onClick={togglePrivateRoom}
+          >
+            {isPrivateRoom ? <Lock aria-hidden /> : <Unlock aria-hidden />}
+          </Button>
+        )}
         <Button className="white-button" variant="link" onClick={copyRoomLink}>
           <Share aria-hidden />
         </Button>

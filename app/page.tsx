@@ -37,7 +37,7 @@ export default function Index() {
     }
     const { room, uuid } = JSON.parse(data);
     cacheRoomAndUser(room, uuid);
-    router.push(`/chat/${room}`);
+    router.push(`/chat/${room}?host=true`);
   };
 
   /**
