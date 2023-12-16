@@ -21,6 +21,12 @@ serve(async (req) => {
       throw new Error("room has no online members");
     }
 
+    if (roomData.online_members.length >= 6) {
+      return new Response("room is full", {
+        status: 400,
+      });
+    }
+
     const newUuid = crypto.randomUUID();
     const { error } = await adminSupabase.from("room").upsert({
       id: room,
