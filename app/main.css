@@ -1,0 +1,9 @@
+.white-button {
+  background-color: transparent;
+  color: white;
+}
+
+textarea::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}
