@@ -4,6 +4,7 @@ import "./font.css";
 import "./bg.css";
 import "./main.css";
 import { Toaster } from "@/components/ui/toaster";
+import Head from "next/head";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
