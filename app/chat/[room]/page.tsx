@@ -157,12 +157,11 @@ export default function Chat({
   /**
    * Sends a message to the channel associated with the room.
    * @returns nothing
-   * @sideeffect updates `myMessage` to only last line of the message
+   * @sideeffect updates `myMessage` to only last 2 lines of the message
    */
   const sendMessage = async () => {
     if (!myUuid) return;
-    const lastLine = myMessage.split("\n").pop();
-    if (!lastLine) return;
+    const lastLine = myMessage.split("\n").slice(-3).join("\n");
     setMyMessage(lastLine);
     const newMessage: Message = {
       user_id: myUuid,
