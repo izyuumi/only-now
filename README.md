@@ -1,5 +1,7 @@
 # OnlyNow
 
+[![OnlyNow](public/preview.png)](https://onlynow.yumi.to/)
+
 A simple chat app that allows you to chat with people who are online in the same room as you.
 
 ## Supabase Launch Week X Hackathon
@@ -27,6 +29,30 @@ The app is built with the following technologies:
 - [Tailwind CSS](https://tailwindcss.com/)
 - [Supabase](https://supabase.com/)
 - [Vercel](https://vercel.com/)
+
+## Supabase Backend
+
+### Database
+
+There is only one tabel in the database, `room`, which is defined as follows:
+
+```sql
+create table
+  public.room (
+    id uuid not null default gen_random_uuid (),
+    created_at timestamp with time zone not null default now(),
+    private boolean not null default true,
+    online_members uuid[] null,
+    creator uuid null,
+    constraint room_pkey primary key (id)
+  ) tablespace pg_default;
+```
+
+Row Level Security (RLS) is not defined to not allow any direct interactions with the database by the clients. Instead, all interactions are done through the Edge Functions.
+
+### Edge Functions
+
+All edge functions are defined in the [`supabase/functions` ](./supabase/functions/) directory and are hosted on Supabase.
 
 ## License
 
