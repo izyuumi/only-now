@@ -6,7 +6,7 @@ import { cacheRoomAndUser, getUserFromRoom, removeUserFromRoom } from "@/utils";
 import { createClient } from "@/utils/supabase/client";
 import { ChevronLeft, Lock, Share, Unlock } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { generateCircle } from "../../../components/ui/circles-utility";
 import { z } from "zod";
 
@@ -312,7 +312,7 @@ const CustomTextarea = (props: TextareaProps) => {
 
   const isMe = who === "me";
 
-  const textareaRef = React.useRef<HTMLTextAreaElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     let textarea = textareaRef.current;
