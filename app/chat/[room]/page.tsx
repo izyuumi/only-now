@@ -231,6 +231,20 @@ export default function Chat({
   };
 
   /**
+   * Copies the room code to the clipboard.
+   * @returns nothing
+   * @sideeffect shows a toast
+   * @sideeffect copies the room code to the clipboard
+   */
+  const copyRoomCode = () => {
+    navigator.clipboard.writeText(roomCode);
+    toast({
+      title: "Room code copied",
+      description: "You can now share this code with your friends",
+    });
+  };
+
+  /**
    * Toggles the room between private and public.
    * If the room is private, it makes it public.
    * If the room is public, it makes it private.
@@ -339,7 +353,7 @@ export default function Chat({
                 <Button
                   className="white-button w-full"
                   variant="outline"
-                  onClick={() => navigator.clipboard.writeText(roomCode)}
+                  onClick={copyRoomCode}
                 >
                   Copy room code ({roomCode})
                 </Button>
