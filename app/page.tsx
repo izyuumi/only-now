@@ -8,7 +8,16 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { initializeBackgroundAnimation } from "@/components/BackgroundAnimation";
-import { Loader2 } from "lucide-react";
+import { GithubIcon, HelpCircle, Loader2 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import Link from "next/link";
 
 export default function Index() {
   const supabase = createClient();
@@ -104,14 +113,35 @@ export default function Index() {
   };
 
   return (
-    <div className="bg flex-1 w-full flex flex-col gap-20 items-center justify-center">
+    <div className="bg flex-1 w-full flex flex-col gap-20 items-center justify-center relative">
       <h1 className="title">OnlyNow</h1>
+      <div className="absolute top-4 right-4">
+        <Dialog>
+          <DialogTrigger>
+            <HelpCircle color="white" size={24} aria-hidden />
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>What is OnlyNow?</DialogTitle>
+              <DialogDescription>
+                OnlyNow is a chat app that lets you chat with people in
+                real-time and only in real-time.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex gap-2 w-full justify-end">
+              <Link href="https://github.com/izyumidev/only-now">
+                <GithubIcon size={24} />
+              </Link>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
       <ul className="box" id="box-container"></ul>
       <div className="flex flex-col gap-2 w-64 max-w-[90%]">
         <Input
           placeholder="Room code"
           autoFocus
-          className="bg-gray-300"
+          className="bg-gray-300 text-black"
           value={roomCode}
           onChange={(e) => setRoomCode(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && joinFromCode()}
@@ -119,18 +149,24 @@ export default function Index() {
           autoComplete="off"
         />
         {roomCode ? (
-          <Button className="bg-violet-400" onClick={() => joinFromCode()}>
+          <Button
+            className="bg-violet-400 text-black"
+            onClick={() => joinFromCode()}
+          >
             Join room
           </Button>
         ) : (
           <>
-            <Button onClick={createRoom} className="bg-sky-800">
+            <Button
+              onClick={createRoom}
+              className="bg-sky-800 text-white hover:text-black"
+            >
               Create a room
             </Button>
             <Button
               onClick={findRandomRoom}
               variant="outline"
-              className="bg-green-200"
+              className="bg-green-200 text-black"
             >
               Join a random room
             </Button>

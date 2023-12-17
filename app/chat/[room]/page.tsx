@@ -175,7 +175,7 @@ export default function Chat({
           toast({
             title: "Connected to room",
             description: "You can now chat in this room",
-            className: "bg-green-100",
+            className: "bg-green-800",
           });
         }
       });
@@ -318,14 +318,13 @@ export default function Chat({
             {isPrivateRoom ? <Lock aria-hidden /> : <Unlock aria-hidden />}
           </Button>
         )}
-
         <DropdownMenu>
           <DropdownMenuTrigger>
             <Button className="white-button" variant="link">
               <Share aria-hidden />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="bg-transparent">
+          <DropdownMenuContent>
             <DropdownMenuItem>
               <Button
                 className="white-button w-full"
