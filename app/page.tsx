@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { initializeBackgroundAnimation } from "@/components/BackgroundAnimation";
+import { Loader2 } from "lucide-react";
 
 export default function Index() {
   const supabase = createClient();
@@ -15,6 +16,7 @@ export default function Index() {
   const { toast } = useToast();
 
   const [roomCode, setRoomCode] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     initializeBackgroundAnimation();
@@ -27,8 +29,10 @@ export default function Index() {
    * @sideeffect shows an error message if something goes wrong
    */
   const createRoom = async () => {
+    setIsLoading(true);
     const { data, error } = await supabase.functions.invoke("createRoom");
     if (error) {
+      setIsLoading(false);
       toast({
         title: "Something went wrong. Please try again later.",
         description: error.message,
@@ -37,6 +41,7 @@ export default function Index() {
     }
     const { room, uuid, roomCode } = JSON.parse(data);
     if (!room || !uuid) {
+      setIsLoading(false);
       toast({
         title: "Something went wrong. Please try again later.",
         description: "Room or UUID not found.",
@@ -57,9 +62,11 @@ export default function Index() {
    * @sideeffect shows an error message if the room code is invalid
    */
   const findRandomRoom = async () => {
+    setIsLoading(true);
     const { data, error } = await supabase.functions.invoke("findRandomRoom");
     if (error) {
       console.log(error);
+      setIsLoading(false);
       return;
     }
     const { room, uuid } = JSON.parse(data);
@@ -76,12 +83,15 @@ export default function Index() {
    * @sideeffect shows an error message if something goes wrong
    */
   const joinFromCode = async () => {
+    if (!roomCode) return;
+    setIsLoading(true);
     const { data, error } = await supabase.functions.invoke("joinFromCode", {
       body: {
         code: roomCode.trim(),
       },
     });
     if (error) {
+      setIsLoading(false);
       toast({
         title: "Something went wrong. Please try again later.",
         description: error.message,
@@ -127,6 +137,18 @@ export default function Index() {
           </>
         )}
       </div>
+      {isLoading && (
+        <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="loader">
+            <Loader2
+              height={64}
+              width={64}
+              className="animate-spin"
+              color="white"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
