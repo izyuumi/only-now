@@ -328,7 +328,7 @@ export default function Chat({
           <DropdownMenuContent className="bg-transparent">
             <DropdownMenuItem>
               <Button
-                className="white-button"
+                className="white-button w-full"
                 variant="outline"
                 onClick={copyRoomLink}
               >
@@ -338,7 +338,7 @@ export default function Chat({
             {roomCode !== "" && (
               <DropdownMenuItem>
                 <Button
-                  className="white-button"
+                  className="white-button w-full"
                   variant="outline"
                   onClick={() => navigator.clipboard.writeText(roomCode)}
                 >
