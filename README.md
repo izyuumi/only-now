@@ -45,6 +45,7 @@ create table
     private boolean not null default true,
     online_members uuid[] null,
     creator uuid null,
+    room_code text null,
     constraint room_pkey primary key (id)
   ) tablespace pg_default;
 ```
