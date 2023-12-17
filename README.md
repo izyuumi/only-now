@@ -26,6 +26,7 @@ The app is built with the following technologies:
 
 - [React](https://reactjs.org/)
 - [Next.js](https://nextjs.org/)
+- [shadcn/ui](https://ui.shadcn.com/)
 - [Tailwind CSS](https://tailwindcss.com/)
 - [Supabase](https://supabase.com/)
 - [Vercel](https://vercel.com/)
