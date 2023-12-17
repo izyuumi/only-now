@@ -6,12 +6,9 @@ export const checkRoomExists = async (room: string) => {
     .select("*")
     .eq("id", room)
     .single();
-  if (error) {
-    throw new Error(error.message);
-  }
-  if (!roomData) {
-    throw new Error("room not found");
-  }
+  if (error) throw new Error(error.message);
+  if (!roomData) throw new Error("room not found");
+
   return roomData;
 };
 

@@ -357,11 +357,12 @@ export default function Chat({
               key={user_id}
               who="other"
               message={user.message}
-              user_index={user.user_index}
+              user_index={user_id.split("-")[0]}
             />
           ))}
         <CustomTextarea
           who="me"
+          user_index={myUuid.split("-")[0]}
           message={myMessage}
           setMessage={setMyMessage}
         />
@@ -377,15 +378,15 @@ interface MeTextareaProps {
 
 interface OtherTextareaProps {
   who: "other";
-  user_index: number;
 }
 
 type TextareaProps = (MeTextareaProps | OtherTextareaProps) & {
   message: string;
+  user_index: string;
 };
 
 const CustomTextarea = (props: TextareaProps) => {
-  const { who, message } = props;
+  const { who, message, user_index } = props;
 
   const isMe = who === "me";
 
@@ -399,9 +400,9 @@ const CustomTextarea = (props: TextareaProps) => {
   }, [message]);
 
   return (
-    <div className="relative border-gray-200 border-solid border-2 rounded-md">
-      <label className="text-center text-xl absolute bottom-1 right-2 text-gray-400">
-        {isMe ? "You" : `User ${props.user_index}`}
+    <div className="relative border-gray-200 border-solid border-2 rounded-md group">
+      <label className="text-center text-xl absolute bottom-1 right-2 text-gray-400 opacity-0 group-hover:opacity-100">
+        {`${isMe ? "You" : "User"} ${user_index}`}
       </label>
       <textarea
         cols={30}

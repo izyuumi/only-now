@@ -9,11 +9,10 @@ serve(async (req) => {
   }
   try {
     const { room } = await req.json();
-    if (!room) {
+    if (!room)
       return new Response("room is required", {
         status: 400,
       });
-    }
 
     const roomData = await checkRoomExists(room);
     if (!roomData.online_members) {
@@ -40,7 +39,7 @@ serve(async (req) => {
       JSON.stringify({
         uuid: newUuid,
       }),
-      { headers: corsHeaders },
+      { headers: corsHeaders }
     );
   } catch (error) {
     console.error(error);
