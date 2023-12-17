@@ -35,9 +35,9 @@ export default function Index() {
       });
       return;
     }
-    const { room, uuid } = JSON.parse(data);
+    const { room, uuid, roomCode } = JSON.parse(data);
     cacheRoomAndUser(room, uuid);
-    router.push(`/chat/${room}?host=true`);
+    router.push(`/chat/${room}?host=true&roomCode=${roomCode}`);
   };
 
   /**
