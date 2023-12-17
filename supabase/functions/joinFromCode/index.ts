@@ -11,7 +11,7 @@ serve(async (req) => {
     const { data: roomData, error } = await adminSupabase
       .from("room")
       .select("id")
-      .eq("id", code)
+      .eq("room_code", code)
       .maybeSingle();
     if (error) {
       throw new Error(error.message);
