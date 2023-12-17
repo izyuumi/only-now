@@ -105,6 +105,8 @@ export default function Index() {
           value={roomCode}
           onChange={(e) => setRoomCode(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && joinFromCode()}
+          type="text"
+          autoComplete="off"
         />
         {roomCode ? (
           <Button className="bg-violet-400" onClick={() => joinFromCode()}>
