@@ -78,7 +78,7 @@ export default function Index() {
   const joinFromCode = async () => {
     const { data, error } = await supabase.functions.invoke("joinFromCode", {
       body: {
-        room: roomCode,
+        code: roomCode,
       },
     });
     if (error) {
