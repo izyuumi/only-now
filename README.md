@@ -53,7 +53,7 @@ Row Level Security (RLS) is not defined to not allow any direct interactions wit
 
 ### Edge Functions
 
-All edge functions are defined in the [`supabase/functions` ](./supabase/functions/) directory and are hosted on Supabase.
+All edge functions are defined in the [`supabase/functions`](./supabase/functions/) directory and are hosted on Supabase.
 
 ## License
 
