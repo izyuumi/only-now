@@ -13,9 +13,8 @@ serve(async (req) => {
       .select("id")
       .eq("room_code", code)
       .maybeSingle();
-    if (error) {
-      throw new Error(error.message);
-    }
+    if (error) throw new Error(error.message);
+
     if (!roomData) return new Response("no rooms found", { status: 404 });
 
     const { id } = roomData;
