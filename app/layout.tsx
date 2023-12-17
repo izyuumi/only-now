@@ -23,13 +23,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={GeistSans.className}>
-      <head>
-        <meta property="og:title" content={metadata.title} />
-        <meta property="og:description" content={metadata.description} />
-        <meta property="og:type" content="website" />
-        <meta property="og:image" content="/preview.png" />
-        <meta property="og:url" content={metadata.metadataBase.href} />
-      </head>
       <body className="bg-background text-foreground">
         <ThemeProvider
           attribute="class"
