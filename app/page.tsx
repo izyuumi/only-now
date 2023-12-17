@@ -36,8 +36,18 @@ export default function Index() {
       return;
     }
     const { room, uuid, roomCode } = JSON.parse(data);
+    if (!room || !uuid) {
+      toast({
+        title: "Something went wrong. Please try again later.",
+        description: "Room or UUID not found.",
+      });
+      return;
+    }
     cacheRoomAndUser(room, uuid);
-    router.push(`/chat/${room}?host=true&roomCode=${roomCode}`);
+    if (roomCode) {
+      localStorage.setItem(`roomCode:${room}`, roomCode);
+    }
+    router.push(`/chat/${room}?host=true`);
   };
 
   /**

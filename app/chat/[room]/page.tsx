@@ -9,6 +9,12 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { generateCircle } from "../../../components/ui/circles-utility";
 import { z } from "zod";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const MessageSchema = z.object({
   user_id: z.string(),
@@ -41,6 +47,7 @@ export default function Chat({
   const [users, setUsers] = useState<Record<string, User>>({});
   const [myMessage, setMyMessage] = useState("");
   const [isHost, setIsHost] = useState(false);
+  const [roomCode, setRoomCode] = useState("");
 
   /**
    * Checks if the room is cached.
@@ -75,6 +82,14 @@ export default function Chat({
       window.history.replaceState({}, "", `${window.location.pathname}`);
     }
   };
+
+  /**
+   * Checks local storage for a room code associated with the room.
+   * @returns nothing
+   * @sideeffect sets `roomCode`
+   */
+  const checkForRoomCode = async () =>
+    setRoomCode(localStorage.getItem(`roomCode:${params.room}`) ?? "");
 
   /**
    * Connects to the room from the room code in the URL.
@@ -169,6 +184,7 @@ export default function Chat({
   useEffect(() => {
     checkCache();
     checkIsHost();
+    checkForRoomCode();
   }, []);
 
   /**
@@ -302,9 +318,36 @@ export default function Chat({
             {isPrivateRoom ? <Lock aria-hidden /> : <Unlock aria-hidden />}
           </Button>
         )}
-        <Button className="white-button" variant="link" onClick={copyRoomLink}>
-          <Share aria-hidden />
-        </Button>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger>
+            <Button className="white-button" variant="link">
+              <Share aria-hidden />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="bg-transparent">
+            <DropdownMenuItem>
+              <Button
+                className="white-button"
+                variant="outline"
+                onClick={copyRoomLink}
+              >
+                Copy room link
+              </Button>
+            </DropdownMenuItem>
+            {roomCode !== "" && (
+              <DropdownMenuItem>
+                <Button
+                  className="white-button"
+                  variant="outline"
+                  onClick={() => navigator.clipboard.writeText(roomCode)}
+                >
+                  Copy room code ({roomCode})
+                </Button>
+              </DropdownMenuItem>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
       <div className="flex flex-col gap-2">
         {Object.entries(users)
