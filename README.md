@@ -35,7 +35,7 @@ The app is built with the following technologies:
 
 ### Database
 
-There is only one tabel in the database, `room`, which is defined as follows:
+There is only one table in the database, `room`, which is defined as follows:
 
 ```sql
 create table
