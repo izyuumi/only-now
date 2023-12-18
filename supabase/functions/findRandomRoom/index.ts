@@ -18,9 +18,12 @@ serve(async (req) => {
 
     const { id, online_members } = roomData[0];
     const newUuid = crypto.randomUUID();
-    const { error: updateError } = await adminSupabase.from("room").update({
-      online_members: [...(online_members ?? []), newUuid],
-    });
+    const { error: updateError } = await adminSupabase
+      .from("room")
+      .update({
+        online_members: [...(online_members ?? []), newUuid],
+      })
+      .eq("id", id);
     if (updateError) throw new Error(updateError.message);
 
     return new Response(JSON.stringify({ room: id, uuid: newUuid }), {
