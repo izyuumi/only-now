@@ -5,6 +5,7 @@ import "./bg.css";
 import "./main.css";
 import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Analytics } from "@vercel/analytics/react";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -34,6 +35,7 @@ export default function RootLayout({
             {children}
           </main>
           <Toaster />
+          <Analytics />
         </ThemeProvider>
       </body>
     </html>
