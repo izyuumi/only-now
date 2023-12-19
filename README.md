@@ -56,6 +56,18 @@ Row Level Security (RLS) is not defined to not allow any direct interactions wit
 
 All edge functions are defined in the [`supabase/functions`](./supabase/functions/) directory and are hosted on Supabase.
 
+### Cron Jobs
+
+Install the [pg_cron](https://supabase.com/docs/guides/database/extensions/pg_cron) extension on Supabase and run the following SQL query to schedule the cron job to clean up old rooms every three hours:
+
+```sql
+select cron.schedule(
+  'cleanup-of-old-rooms',
+  '0 */3 * * *', -- Every three hours
+  $$ delete from shortlinks where created_at < now() - interval '3 hours' $$
+)
+```
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details. The project is fully open source, and we welcome contributions from the community.
