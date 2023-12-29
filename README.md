@@ -20,6 +20,8 @@ After successful initial release, the following features are planned:
 
 For a detailed information about the roadmap, please refer to the [project board](https://github.com/users/izyumidev/projects/4).
 
+If you like this project, please support us by leaving a star on this repo!!
+
 ## Stack
 
 The app is built with the following technologies:
